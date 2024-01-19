@@ -3,7 +3,7 @@ import ScoreLabel from "../ui/ScoreLabel";
 import BombSpawner from "../actions/BombSpawner";
 
 const CLIMBERS_KEY = "ground";
-const CLIMBERS_SRC = "assets/building-climb3.png";
+const CLIMBERS_SRC = "assets/dinasaur-climb3-removebg.png";
 
 const BACKGROUND_KEY = "sky";
 const BACKGROUND_SRC = "assets/pngimg-building.png";
@@ -16,6 +16,12 @@ const TARGET_OBJECT_SRC = "assets/cartoon-male.png";
 
 const BOMB_OBSTACLE_KEY = "bomb";
 const BOMB_OBSTACLE_SRC = "assets/bomb.png";
+
+const EAT_REWARD_SOUND_KEY = "eatRewardSound";
+const EAT_REWARD_SOUND_SRC = "assets/sounds/eat-reward.wav";
+
+const OUT_SOUND_KEY = "outSound";
+const OUT_SOUND_SRC = "assets/sounds/outSound.wav";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -39,6 +45,13 @@ export default class GameScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 48,
     });
+
+    // sounds
+    // Load the EAT REWARD sound
+    this.load.audio(EAT_REWARD_SOUND_KEY, EAT_REWARD_SOUND_SRC);
+
+    // Load the OUT sound
+    this.load.audio(OUT_SOUND_KEY, OUT_SOUND_SRC);
   }
 
   create() {
@@ -94,6 +107,9 @@ export default class GameScene extends Phaser.Scene {
 
       this.bombSpawner.spawn(player.x);
     }
+
+    // Play the hit sound when the character hits a star
+    this.playEatSound();
   }
 
   createScoreLabel(x, y, score) {
@@ -148,12 +164,15 @@ export default class GameScene extends Phaser.Scene {
     player.anims.play("turn");
 
     this.gameOver = true;
+
+    // Play the hit sound when the character hits an obstacle
+    this.playOutSound();
   }
 
   createPlatforms() {
     const platforms = this.physics.add.staticGroup();
 
-    platforms.create(400, 650, CLIMBERS_KEY).setScale(2).refreshBody();
+    platforms.create(400, 768, CLIMBERS_KEY).setScale(2).refreshBody();
 
     platforms.create(600, 400, CLIMBERS_KEY);
     platforms.create(50, 250, CLIMBERS_KEY);
@@ -227,5 +246,13 @@ export default class GameScene extends Phaser.Scene {
         this.startButton.destroy();
       }
     }
+  }
+
+  playEatSound() {
+    this.sound.play(EAT_REWARD_SOUND_KEY);
+  }
+
+  playOutSound() {
+    this.sound.play(OUT_SOUND_KEY);
   }
 }
