@@ -1,12 +1,12 @@
 import Phaser from "phaser";
-
 import ScoreLabel from "../ui/ScoreLabel";
 import BombSpawner from "../actions/BombSpawner";
 
-const GROUND_KEY = "ground";
+const CLIMBERS_KEY = "ground";
+const CLIMBERS_SRC = "assets/building-climb3.png";
 
 const BACKGROUND_KEY = "sky";
-const BACKGROUND_SRC = "assets/sky.png";
+const BACKGROUND_SRC = "assets/pngimg-building.png";
 
 const MAIN_CHARACTER_KEY = "dude";
 const MAIN_CHARACTER_SRC = "assets/dude.png";
@@ -14,7 +14,8 @@ const MAIN_CHARACTER_SRC = "assets/dude.png";
 const TARGET_OBJECT_KEY = "star";
 const TARGET_OBJECT_SRC = "assets/cartoon-male.png";
 
-const BOMB_KEY = "bomb";
+const BOMB_OBSTACLE_KEY = "bomb";
+const BOMB_OBSTACLE_SRC = "assets/bomb.png";
 
 export default class GameScene extends Phaser.Scene {
   constructor() {
@@ -25,13 +26,14 @@ export default class GameScene extends Phaser.Scene {
     this.stars = undefined;
     this.bombSpawner = undefined;
     this.gameOver = false;
+    this.gameStarted = false;
   }
 
   preload() {
     this.load.image(BACKGROUND_KEY, BACKGROUND_SRC);
-    this.load.image(GROUND_KEY, "assets/platform.png");
+    this.load.image(CLIMBERS_KEY, CLIMBERS_SRC);
     this.load.image(TARGET_OBJECT_KEY, TARGET_OBJECT_SRC);
-    this.load.image(BOMB_KEY, "assets/bomb.png");
+    this.load.image(BOMB_OBSTACLE_KEY, BOMB_OBSTACLE_SRC);
 
     this.load.spritesheet(MAIN_CHARACTER_KEY, MAIN_CHARACTER_SRC, {
       frameWidth: 32,
@@ -41,6 +43,7 @@ export default class GameScene extends Phaser.Scene {
 
   create() {
     this.add.image(400, 300, BACKGROUND_KEY);
+    // Uncomment the line below if you want to add an image of the star
     // this.add.image(400, 300, "star");
 
     const platforms = this.createPlatforms();
@@ -50,7 +53,7 @@ export default class GameScene extends Phaser.Scene {
 
     this.ScoreLabel = this.createScoreLabel(16, 16, 0);
 
-    this.bombSpawner = new BombSpawner(this, BOMB_KEY);
+    this.bombSpawner = new BombSpawner(this, BOMB_OBSTACLE_KEY);
     const bombsGroup = this.bombSpawner.group;
 
     this.physics.add.collider(this.player, platforms);
@@ -74,6 +77,9 @@ export default class GameScene extends Phaser.Scene {
     );
 
     this.cursors = this.input.keyboard.createCursorKeys();
+
+    // Create the Start Game button
+    this.createStartButton();
   }
 
   collectStar(player, star) {
@@ -100,17 +106,17 @@ export default class GameScene extends Phaser.Scene {
   }
 
   createStars() {
-    const stars = this.physics.add.group({
+    const targetObjects = this.physics.add.group({
       key: TARGET_OBJECT_KEY,
       repeat: 11,
       setXY: { x: 12, y: 0, stepX: 70 },
     });
 
-    stars.children.iterate((child) => {
+    targetObjects.children.iterate((child) => {
       child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
     });
 
-    return stars;
+    return targetObjects;
   }
 
   update() {
@@ -147,11 +153,11 @@ export default class GameScene extends Phaser.Scene {
   createPlatforms() {
     const platforms = this.physics.add.staticGroup();
 
-    platforms.create(400, 568, GROUND_KEY).setScale(2).refreshBody();
+    platforms.create(400, 650, CLIMBERS_KEY).setScale(2).refreshBody();
 
-    platforms.create(600, 400, GROUND_KEY);
-    platforms.create(50, 250, GROUND_KEY);
-    platforms.create(750, 220, GROUND_KEY);
+    platforms.create(600, 400, CLIMBERS_KEY);
+    platforms.create(50, 250, CLIMBERS_KEY);
+    platforms.create(750, 220, CLIMBERS_KEY);
 
     return platforms;
   }
@@ -188,5 +194,38 @@ export default class GameScene extends Phaser.Scene {
     });
 
     return player;
+  }
+
+  startGame() {
+    this.gameStarted = true;
+    this.scene.start("game-scene");
+  }
+
+  createStartButton() {
+    if (!this.gameStarted && !this.gameOver) {
+      const startButton = this.add
+        .text(400, 300, "Start Game", {
+          fontSize: "32px",
+          fill: "#fff",
+          backgroundColor: "#333",
+          padding: {
+            x: 16,
+            y: 8,
+          },
+          align: "center",
+        })
+        .setOrigin(0.5)
+        .setInteractive();
+
+      startButton.on("pointerdown", () => {
+        this.startGame();
+      });
+
+      this.startButton = startButton;
+    } else {
+      if (this.startButton) {
+        this.startButton.destroy();
+      }
+    }
   }
 }
