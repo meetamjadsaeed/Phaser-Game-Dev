@@ -34,6 +34,7 @@ export default class GameScene extends Phaser.Scene {
     this.bombSpawner = undefined;
     this.gameOver = false;
     this.gameStarted = false;
+    this.skinChangeDropdown = undefined;
   }
 
   preload() {
@@ -219,6 +220,7 @@ export default class GameScene extends Phaser.Scene {
   startGame() {
     this.gameStarted = true;
     this.scene.start("game-scene");
+    this.changeBackgroundSkin();
   }
 
   createStartButton() {
@@ -239,9 +241,6 @@ export default class GameScene extends Phaser.Scene {
 
       startButton.on("pointerdown", () => {
         this.startGame();
-
-        // // skin change dropdown
-        this.changeBackgroundSkin();
       });
 
       this.startButton = startButton;
@@ -261,6 +260,7 @@ export default class GameScene extends Phaser.Scene {
   }
 
   changeBackgroundSkin() {
+    console.log("running changeBackgroundSkin");
     const backgroundOptions = ["Background 1", "Background 2", "Background 3"];
     const backgroundDropdown = new Dropdown(
       this,
