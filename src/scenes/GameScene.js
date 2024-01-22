@@ -1,21 +1,22 @@
 import Phaser from "phaser";
 import ScoreLabel from "../ui/ScoreLabel";
 import BombSpawner from "../actions/BombSpawner";
+import Dropdown from "../ui/Dropdown";
 
 const CLIMBERS_KEY = "ground";
-const CLIMBERS_SRC = "assets/dinasaur-climb3-removebg.png";
+const CLIMBERS_SRC = "assets/supporters/dinasaur-climb3-removebg.png";
 
 const BACKGROUND_KEY = "sky";
-const BACKGROUND_SRC = "assets/pngimg-building.png";
+const BACKGROUND_SRC = "assets/backgrounds/pngimg-building.png";
 
 const MAIN_CHARACTER_KEY = "dude";
-const MAIN_CHARACTER_SRC = "assets/dude.png";
+const MAIN_CHARACTER_SRC = "assets/actors/dude.png";
 
 const TARGET_OBJECT_KEY = "star";
-const TARGET_OBJECT_SRC = "assets/cartoon-male.png";
+const TARGET_OBJECT_SRC = "assets/rewards/cartoon-male.png";
 
 const BOMB_OBSTACLE_KEY = "bomb";
-const BOMB_OBSTACLE_SRC = "assets/bomb.png";
+const BOMB_OBSTACLE_SRC = "assets/obstacles/bomb.png";
 
 const EAT_REWARD_SOUND_KEY = "eatRewardSound";
 const EAT_REWARD_SOUND_SRC = "assets/sounds/eat-reward.wav";
@@ -238,6 +239,9 @@ export default class GameScene extends Phaser.Scene {
 
       startButton.on("pointerdown", () => {
         this.startGame();
+
+        // // skin change dropdown
+        this.changeBackgroundSkin();
       });
 
       this.startButton = startButton;
@@ -254,5 +258,27 @@ export default class GameScene extends Phaser.Scene {
 
   playOutSound() {
     this.sound.play(OUT_SOUND_KEY);
+  }
+
+  changeBackgroundSkin() {
+    const backgroundOptions = ["Background 1", "Background 2", "Background 3"];
+    const backgroundDropdown = new Dropdown(
+      this,
+      100,
+      100,
+      backgroundOptions,
+      "Background 1"
+    );
+
+    backgroundDropdown.setPosition(100, 100);
+
+    // Add the dropdown to the scene
+    this.add.existing(backgroundDropdown);
+
+    // Add an event listener to handle changes to the background skin
+    backgroundDropdown.on("change", (selectedOption) => {
+      // Handle background skin change here based on selectedOption
+      console.log(`Selected background: ${selectedOption}`);
+    });
   }
 }
